@@ -6,9 +6,9 @@ User = get_user_model()
 
 class Group(models.Model):
     """Модель Group."""
-    title = models.CharField("group title", max_length=200)
-    slug = models.SlugField("group slug", unique=True)
-    description = models.TextField("group description")
+    title = models.CharField("Название группы", max_length=200)
+    slug = models.SlugField("Slug группы", unique=True)
+    description = models.TextField("Описание группы")
 
     def __str__(self) -> str:
         """Метод вывода названия группы."""
@@ -17,12 +17,13 @@ class Group(models.Model):
 
 class Post(models.Model):
     """Модель Post."""
-    text = models.TextField("post text")
-    pub_date = models.DateTimeField("post publication date", auto_now_add=True)
+    text = models.TextField("Текст поста")
+    pub_date = models.DateTimeField("Дата публикации", auto_now_add=True)
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='posts',
+        verbose_name="Автор",
     )
     group = models.ForeignKey(
         Group,
@@ -30,4 +31,5 @@ class Post(models.Model):
         null=True,
         on_delete=models.SET_NULL,
         related_name='posts',
+        verbose_name="Группа",
     )

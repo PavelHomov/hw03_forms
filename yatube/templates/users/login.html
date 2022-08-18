@@ -26,11 +26,8 @@
               {% endfor %}
           {% endif %}
 
-          <form method="post"
-            {% if action_url %}
-              action="{% url action_url %}"
-            {% endif %}
-          >
+          <form method="post" action="{% url 'users:login' %}">
+
           {% csrf_token %}
 
           {% for field in form %}
