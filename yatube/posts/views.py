@@ -3,14 +3,14 @@ from django.contrib.auth.decorators import login_required
 
 from .forms import PostForm
 from .models import Post, Group, User
-from .utils import paginator
+from .utils import paginator_func
 
 
 def index(request):
     """View функция для index."""
     post_list = Post.objects.all().order_by('-pub_date')
     context = {
-        'page_obj': paginator(request, post_list),
+        'page_obj': paginator_func(request, post_list),
     }
 
     return render(request, 'posts/index.html', context)
@@ -22,7 +22,7 @@ def group_posts(request, slug):
     post_list = group.posts.select_related('group').order_by('-pub_date')
     context = {
         'group': group,
-        'page_obj': paginator(request, post_list),
+        'page_obj': paginator_func(request, post_list),
     }
 
     return render(request, 'posts/group_list.html', context)
@@ -34,7 +34,7 @@ def profile(request, username):
     post_list = author.posts.select_related('group').order_by('-pub_date')
     context = {
         'author': author,
-        'page_obj': paginator(request, post_list),
+        'page_obj': paginator_func(request, post_list),
     }
 
     return render(request, 'posts/profile.html', context)
@@ -55,11 +55,11 @@ def post_create(request):
     """View функция для создания записи."""
     form = PostForm(request.POST or None)
     if form.is_valid():
-        form = form.save(commit=False)
-        form.author = request.user
-        form.save()
+        post = form.save(commit=False)
+        post.author = request.user
+        post.save()
 
-        return redirect(f'/profile/{form.author.username}/')
+        return redirect('posts:profile', post.author)
 
     return render(request, 'posts/create_post.html', {'form': form})
 
@@ -69,13 +69,11 @@ def post_edit(request, post_id):
     """View функция для редактирования записи."""
     post = get_object_or_404(Post, pk=post_id)
     form = PostForm(request.POST or None, instance=post)
-    if request.user.id != post.author_id:
+    if request.user != post.author:
 
         return redirect('posts:post_detail', post_id=post_id)
 
     if form.is_valid():
-        post = form.save(commit=False)
-        post.author = request.user
         form.save()
 
         return redirect('posts:post_detail', post_id=post_id)
