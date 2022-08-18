@@ -22,4 +22,3 @@ class PostAdmin(admin.ModelAdmin):
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
     """Админка для Group."""
-
